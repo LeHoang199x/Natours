@@ -17,6 +17,7 @@ const reviewRouter = require('./routers/reviewRoutes');
 const bookingRouter = require('./routers/bookingRoutes');
 const viewRouter = require('./routers/viewRoutes');
 
+// Start express app
 const app = express();
 
 app.use(cookieParser())
