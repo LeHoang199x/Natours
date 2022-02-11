@@ -41,6 +41,12 @@ exports.getTour = catchAsync(async (req, res, next) => {
         })
 });
 
+exports.getSignupForm = (req, res) => {
+    res.status(200).render('signup', {
+        title: 'Sign Up account'
+    });
+};
+
 exports.getLoginForm = (req, res) => {
     res.status(200).render('login', {
         title: 'Log into your account'
@@ -48,13 +54,7 @@ exports.getLoginForm = (req, res) => {
     // .set(
     //     'Content-Security-Policy',
     //     "connect-src 'self' https://cdnjs.cloudflare.com"
-       
-};
-
-exports.getSignupForm = (req, res) => {
-    res.status(200).render('signup', {
-        title: 'Sign Up account'
-    })
+    // 
 };
 
 exports.getMyTours = catchAsync(async (req, res, next) => {
@@ -75,7 +75,7 @@ exports.getAccount = (req, res) => {
     res.status(200).render('account', {
         title: 'Your Account'
     })
-}
+};
 
 exports.updateUserData = catchAsync(async(req, res, next) => {
     const updateUser = await User.findByIdAndUpdate(req.user.id, {
@@ -91,4 +91,4 @@ exports.updateUserData = catchAsync(async(req, res, next) => {
         title: 'Your Account',
         user: updateUser
     })
-})
+});

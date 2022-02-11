@@ -21,6 +21,8 @@ const viewRouter = require('./routers/viewRoutes');
 // Start express app
 const app = express();
 
+app.enable('trust proxy');
+
 app.use(cookieParser())
 
 app.set('view engine', 'pug');
