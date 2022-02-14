@@ -9,7 +9,6 @@ exports.getOverview = catchAsync(async (req, res, next) => {
     const tours = await Tour.find();
 
     // 2) Build template
-
     // 3) Render that template using tour data from 1)
     res.status(200).render('overview', {
         title: 'All Tours',
@@ -30,15 +29,10 @@ exports.getTour = catchAsync(async (req, res, next) => {
     
     // 2) Build template
     // 3) Render that template using data from 1)
-    res.status(200)
-        .set(
-            'Content-Security-Policy',
-            'connect-src https://*.tiles.mapbox.com https://api.mapbox.com https://events.mapbox.com'
-        )
-        .render('tour', {
-            title: `${tour.name} Tour`,
-            tour
-        })
+    res.status(200).render('tour', {
+        title: `${tour.name} Tour`,
+        tour
+    });
 });
 
 exports.getSignupForm = (req, res) => {
@@ -51,10 +45,6 @@ exports.getLoginForm = (req, res) => {
     res.status(200).render('login', {
         title: 'Log into your account'
     })
-    // .set(
-    //     'Content-Security-Policy',
-    //     "connect-src 'self' https://cdnjs.cloudflare.com"
-    // 
 };
 
 exports.getMyTours = catchAsync(async (req, res, next) => {

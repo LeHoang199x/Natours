@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { findByIdAndDelete } = require('./tourModel');
+// const { findByIdAndDelete } = require('./tourModel');
 const Tour = require('./tourModel');
 
 const reviewSchema = new mongoose.Schema({
@@ -45,7 +45,6 @@ reviewSchema.pre(/^find/, function(next) {
         path: 'user',
         select: 'name photo'
     });
-
     next();
 });
 

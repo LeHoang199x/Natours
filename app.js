@@ -7,7 +7,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
-const csp = require('express-csp');
+// const csp = require('express-csp');
 const compression = require('compression');
 const cors = require('cors');
 
@@ -31,19 +31,19 @@ app.set('views', path.join(__dirname, 'views'));
 
 // 1) GLOBAL MIDDLEWARE
 // Implement CORS
-app.use(cors());
+// app.use(cors());
+// / Access-Control-Allow-Origin *
+// api.natours.com, front-end natours.com
+// app.use(cors({
+//   origin: 'https://www.natours.com'
+// }))
 
 // Access-Control-Allow-Origin
 app.options('*', cors());
+// app.options('/api/v1/tours/:id', cors());
 
 // Serving static files
-app.use(express.static(path.join(__dirname, 'public')))
-
-// Set security HTTP headers
-// app.use(helmet({ contentSecurityPolicy: false }));
-
-//Add the following
-// Further HELMET configuration for Security Policy (CSP)
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
@@ -51,73 +51,71 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.use(helmet());
-app.use(helmet());
-csp.extend(app, {
-  policy: {
-    directives: {
-      'default-src': ['self'],
-      'style-src': ['self', 'unsafe-inline', 'https:'],
-      'font-src': ['self', 'https://fonts.gstatic.com'],
-      'script-src': [
-        'self',
-        'unsafe-inline',
-        'data',
-        'blob',
-        'https://js.stripe.com',
-        'https://*.mapbox.com',
-        'https://*.cloudflare.com/',
-        'https://bundle.js:8828',
-        'ws://localhost:56558/',
-      ],
-      'worker-src': [
-        'self',
-        'unsafe-inline',
-        'data:',
-        'blob:',
-        'https://*.stripe.com',
-        'https://*.mapbox.com',
-        'https://*.cloudflare.com/',
-        'https://bundle.js:*',
-        'ws://localhost:*/',
-      ],
-      'frame-src': [
-        'self',
-        'unsafe-inline',
-        'data:',
-        'blob:',
-        'https://*.stripe.com',
-        'https://*.mapbox.com',
-        'https://*.cloudflare.com/',
-        'https://bundle.js:*',
-        'ws://localhost:*/',
-      ],
-      'img-src': [
-        'self',
-        'unsafe-inline',
-        'data:',
-        'blob:',
-        'https://*.stripe.com',
-        'https://*.mapbox.com',
-        'https://*.cloudflare.com/',
-        'https://bundle.js:*',
-        'ws://localhost:*/',
-      ],
-      'connect-src': [
-        'self',
-        'unsafe-inline',
-        'data:',
-        'blob:',
-        // 'wss://<HEROKU-SUBDOMAIN>.herokuapp.com:<PORT>/',
-        'https://*.stripe.com',
-        'https://*.mapbox.com',
-        'https://*.cloudflare.com/',
-        'https://bundle.js:*',
-        'ws://localhost:*/',
-      ],
-    },
-  },
-});
-
+// csp.extend(app, {
+//   policy: {
+//     directives: {
+//       'default-src': ['self'],
+//       'style-src': ['self', 'unsafe-inline', 'https:'],
+//       'font-src': ['self', 'https://fonts.gstatic.com'],
+//       'script-src': [
+//         'self',
+//         'unsafe-inline',
+//         'data',
+//         'blob',
+//         'https://js.stripe.com',
+//         'https://*.mapbox.com',
+//         'https://*.cloudflare.com/',
+//         'https://bundle.js:8828',
+//         'ws://localhost:56558/',
+//       ],
+//       'worker-src': [
+//         'self',
+//         'unsafe-inline',
+//         'data:',
+//         'blob:',
+//         'https://*.stripe.com',
+//         'https://*.mapbox.com',
+//         'https://*.cloudflare.com/',
+//         'https://bundle.js:*',
+//         'ws://localhost:*/',
+//       ],
+//       'frame-src': [
+//         'self',
+//         'unsafe-inline',
+//         'data:',
+//         'blob:',
+//         'https://*.stripe.com',
+//         'https://*.mapbox.com',
+//         'https://*.cloudflare.com/',
+//         'https://bundle.js:*',
+//         'ws://localhost:*/',
+//       ],
+//       'img-src': [
+//         'self',
+//         'unsafe-inline',
+//         'data:',
+//         'blob:',
+//         'https://*.stripe.com',
+//         'https://*.mapbox.com',
+//         'https://*.cloudflare.com/',
+//         'https://bundle.js:*',
+//         'ws://localhost:*/',
+//       ],
+//       'connect-src': [
+//         'self',
+//         'unsafe-inline',
+//         'data:',
+//         'blob:',
+//         // 'wss://<HEROKU-SUBDOMAIN>.herokuapp.com:<PORT>/',
+//         'https://*.stripe.com',
+//         'https://*.mapbox.com',
+//         'https://*.cloudflare.com/',
+//         'https://bundle.js:*',
+//         'ws://localhost:*/',
+//       ],
+//     },
+//   },
+// });
 
 // Limit request from same API
 const limiter = rateLimit({

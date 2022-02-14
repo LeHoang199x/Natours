@@ -82,7 +82,8 @@ exports.logout = (req, res) => {
 exports.protect = catchAsync( async (req, res, next) => {
     // 1) Getting token and check of it's there
     let token;
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    if (req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1];
     } else if(req.cookies.jwt && req.cookies.jwt !== 'loggedout') {
         token = req.cookies.jwt;
@@ -183,7 +184,10 @@ exports.forgotPassword = catchAsync( async(req, res, next) => {
 
 exports.resetPassword = catchAsync( async(req, res, next) => {
     // 1) Get user based on the token
-    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+    const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
 
     const user = await User.findOne({
         passwordResetToken: hashedToken,

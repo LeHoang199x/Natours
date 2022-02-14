@@ -44,7 +44,6 @@ exports.resizeUserPhoto = catchAsync( async (req, res, next ) => {
         .toFile(`public/img/users/${req.file.filename}`);
 
     next();
-
 });
 
 const filterObj = (obj, ...allowedFields) => {
@@ -103,7 +102,7 @@ exports.getAllUsers = factory.getAll(User);
 exports.createUser = (req, res) => {
     res.status(500).json({
         status: 'error',
-        message: 'This route is not defined. Please /signup instead'
+        message: 'This route is not defined. Please use /signup instead'
     })
 };
 
