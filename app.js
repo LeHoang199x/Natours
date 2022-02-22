@@ -7,7 +7,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
-// const csp = require('express-csp');
+const csp = require('express-csp');
 const compression = require('compression');
 const cors = require('cors');
 
@@ -52,71 +52,71 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.use(helmet());
-// csp.extend(app, {
-//   policy: {
-//     directives: {
-//       'default-src': ['self'],
-//       'style-src': ['self', 'unsafe-inline', 'https:'],
-//       'font-src': ['self', 'https://fonts.gstatic.com'],
-//       'script-src': [
-//         'self',
-//         'unsafe-inline',
-//         'data',
-//         'blob',
-//         'https://js.stripe.com',
-//         'https://*.mapbox.com',
-//         'https://*.cloudflare.com/',
-//         'https://bundle.js:8828',
-//         'ws://localhost:56558/',
-//       ],
-//       'worker-src': [
-//         'self',
-//         'unsafe-inline',
-//         'data:',
-//         'blob:',
-//         'https://*.stripe.com',
-//         'https://*.mapbox.com',
-//         'https://*.cloudflare.com/',
-//         'https://bundle.js:*',
-//         'ws://localhost:*/',
-//       ],
-//       'frame-src': [
-//         'self',
-//         'unsafe-inline',
-//         'data:',
-//         'blob:',
-//         'https://*.stripe.com',
-//         'https://*.mapbox.com',
-//         'https://*.cloudflare.com/',
-//         'https://bundle.js:*',
-//         'ws://localhost:*/',
-//       ],
-//       'img-src': [
-//         'self',
-//         'unsafe-inline',
-//         'data:',
-//         'blob:',
-//         'https://*.stripe.com',
-//         'https://*.mapbox.com',
-//         'https://*.cloudflare.com/',
-//         'https://bundle.js:*',
-//         'ws://localhost:*/',
-//       ],
-//       'connect-src': [
-//         'self',
-//         'unsafe-inline',
-//         'data:',
-//         'blob:',
-//         // 'wss://<HEROKU-SUBDOMAIN>.herokuapp.com:<PORT>/',
-//         'https://*.stripe.com',
-//         'https://*.mapbox.com',
-//         'https://*.cloudflare.com/',
-//         'https://bundle.js:*',
-//         'ws://localhost:*/',
-//       ],
-//     },
-//   },
-// });
+csp.extend(app, {
+  policy: {
+    directives: {
+      'default-src': ['self'],
+      'style-src': ['self', 'unsafe-inline', 'https:'],
+      'font-src': ['self', 'https://fonts.gstatic.com'],
+      'script-src': [
+        'self',
+        'unsafe-inline',
+        'data',
+        'blob',
+        'https://js.stripe.com',
+        'https://*.mapbox.com',
+        'https://*.cloudflare.com/',
+        'https://bundle.js:8828',
+        'ws://localhost:56558/',
+      ],
+      'worker-src': [
+        'self',
+        'unsafe-inline',
+        'data:',
+        'blob:',
+        'https://*.stripe.com',
+        'https://*.mapbox.com',
+        'https://*.cloudflare.com/',
+        'https://bundle.js:*',
+        'ws://localhost:*/',
+      ],
+      'frame-src': [
+        'self',
+        'unsafe-inline',
+        'data:',
+        'blob:',
+        'https://*.stripe.com',
+        'https://*.mapbox.com',
+        'https://*.cloudflare.com/',
+        'https://bundle.js:*',
+        'ws://localhost:*/',
+      ],
+      'img-src': [
+        'self',
+        'unsafe-inline',
+        'data:',
+        'blob:',
+        'https://*.stripe.com',
+        'https://*.mapbox.com',
+        'https://*.cloudflare.com/',
+        'https://bundle.js:*',
+        'ws://localhost:*/',
+      ],
+      'connect-src': [
+        'self',
+        'unsafe-inline',
+        'data:',
+        'blob:',
+        // 'wss://<HEROKU-SUBDOMAIN>.herokuapp.com:<PORT>/',
+        'https://*.stripe.com',
+        'https://*.mapbox.com',
+        'https://*.cloudflare.com/',
+        'https://bundle.js:*',
+        'ws://localhost:*/',
+      ],
+    },
+  },
+});
 
 // Limit request from same API
 const limiter = rateLimit({
