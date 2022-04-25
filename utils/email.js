@@ -12,7 +12,7 @@ module.exports = class Email {
     }
 
     newTransport() {
-        if (process.env.NODE_ENV === 'production') {
+        if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') {
             // Sendgrid
             return nodemailer.createTransport({
                 service: 'SendGrid',
@@ -20,6 +20,7 @@ module.exports = class Email {
                     user: process.env.SENDGRID_USERNAME,
                     pass: process.env.SENDGRID_PASSWORD,
                 }
+                
             });
             // return nodemailer.createTransport(nodemailerSendgrid({
             //       apiKey: process.env.SENDGRID_PASSWORD
@@ -51,7 +52,7 @@ module.exports = class Email {
         // 2) Define email options
         const mailOptions = {
             // from: this.from,
-            from: process.env.SENDGRID_EMAIL_FROM,
+            from: this.from,
             to: this.to,
             subject,
             html,
@@ -61,6 +62,10 @@ module.exports = class Email {
         // 3) Create a transport and send email
     await this.newTransport().sendMail(mailOptions);
     }
+
+    // async sendVerifyEmail() {
+    //     await this.send('verify', 'Verify Your Email');
+    // }
 
     async sendWelcome() {
         await this.send('welcome', 'Welcome to the Natours Family');

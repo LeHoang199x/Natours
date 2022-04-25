@@ -2,7 +2,7 @@ const express = require('express');
 const tourController = require('../controllers/tourController');
 const authController = require('../controllers/authController');
 const reviewRouter = require('./reviewRoutes');
-
+const bookingRouter = require('./bookingRoutes');
 
 const router = express.Router();
 
@@ -14,8 +14,8 @@ const router = express.Router();
 // POST /tour/234fadf4/reviews
 // GET /tour/234fadf4/reviews
 
-router.use('/:tourId/reviews', reviewRouter)
-
+router.use('/:tourId/reviews', reviewRouter);
+router.use('/:tourId/bookings', bookingRouter);
 
 router
     .route('/top-5-cheap')

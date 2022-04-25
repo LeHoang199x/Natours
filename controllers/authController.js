@@ -36,6 +36,14 @@ const createSendToken =  (user, statusCode, req, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+    const token = crypto.randomBytes(32).toString('hex');
+    const verifyEmailToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+
+    const verifyEmailTokenExpires = Date.now() + 10 * 60 * 1000;
+
     const newUser = await User.create({
         name: req.body.name,
         email: req.body.email,
@@ -43,14 +51,49 @@ exports.signup = catchAsync(async (req, res, next) => {
         passwordConfirm: req.body.passwordConfirm,
         passwordChangedAt: req.body.passwordChangedAt,
         role: req.body.role,
-        passwordResetToken: req.body.passwordResetToken
+        passwordResetToken: req.body.passwordResetToken,
+        verifyEmailToken,
+        verifyEmailTokenExpires
     });
 
-    const url = `${req.protocol}://${req.get('host')}/me`;
+    const url = `${req.protocol}://${req.get(
+        'host'
+    )}/api/v1/users/verifyEmail/${token}`;
     // console.log(url);
     await new Email(newUser, url).sendWelcome();
 
-    createSendToken(newUser, 201, req, res);
+    res.status(201).json({
+        status: 'success',
+        data: {}
+    });
+});
+
+exports.verifyEmail = catchAsync(async (req, res, next) => {
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(req.params.token)
+      .digest('hex');
+  
+    const newUser = await User.findOne({
+      verifyEmailToken: hashedToken,
+      verifyEmailTokenExpires: { $gt: Date.now() }
+    });
+  
+    if (!newUser)
+      return next(new AppError('Token is invalid or has expired', 400));
+    const url = `${req.protocol}://${req.get('host')}/me`;
+  
+    newUser.emailVerified = true;
+    newUser.verifyEmailToken = undefined;
+    newUser.verifyEmailTokenExpires = undefined;
+    await newUser.save({ validateBeforeSave: false });
+    await new Email(newUser, url).sendWelcome();
+    // if (req.headers['user-agent'].includes('PostmanRuntime'))
+    //   return createSendToken(newUser, 201, req, res);
+  
+    res.status(201).render('verified', {
+      title: 'Email verified Successfully'
+    });
 });
 
 exports.login = catchAsync( async (req, res, next) => {
@@ -66,6 +109,10 @@ exports.login = catchAsync( async (req, res, next) => {
     if (!user || !(await user.correctPassword(password, user.password))) {
         return next(new AppError('Incorrect email or password', 401));
     }
+
+    // if (!user.emailVerified) {
+    //     return next(new AppError('Please First verify your email address!', 401));
+    // }
 
     // 3) If everything ok, send token to client
     createSendToken(user, 200, req, res);
@@ -89,17 +136,30 @@ exports.protect = catchAsync( async (req, res, next) => {
         token = req.cookies.jwt;
     }
 
-    if(!token) {
-        return next(new AppError('You are not logged in. Please log in to get access.', 401));
+    if (!token) {
+        if (!req.headers['user-agent'].includes('PostmanRuntime'))
+          return res.status(401).json({
+            status: 'error',
+            message: 'Please Login to perform this action!'
+          });
+        return next(
+          new AppError('You are not logged in! Please log in to get access.', 401)
+        );
     }
+
+    // if(!token) {
+    //     return next(new AppError('You are not logged in. Please log in to get access.', 401));
+    // }
     // 2) Verification token
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
     // 3) Check if user still exits
     const currentUser = await User.findById(decoded.id);
+
     if (!currentUser) {
         return next(new AppError('The user belonging to this token does no longer exist.', 401));
     }
+
     // 4) Check if user changed password after token is issued
     if (currentUser.changePasswordAfter(decoded.iat)) {
         return next(new AppError('User recently changed password! Please log in again.', 401));
@@ -130,6 +190,12 @@ exports.isLoggedIn = async (req, res, next) => {
             if (currentUser.changePasswordAfter(decoded.iat)) {
                 return next();
             }
+
+            // if (!currentUser.emailVerified) {
+            //     return next(
+            //       new AppError('Please First verify your email address!', 401)
+            //     );
+            // }
     
             // THERE IS A LOGGED IN USER
             res.locals.user = currentUser;
@@ -160,6 +226,10 @@ exports.forgotPassword = catchAsync( async(req, res, next) => {
         return next(new AppError('There is no user with email address', 404))
     }
 
+    // if (!user.emailVerified) {
+    //     return next(new AppError('Please First verify your email address!', 401));
+    // }
+
     // 2) Generate the random reset token
     const resetToken = user.createPasswordResetToken();
     await user.save({ validateBeforeSave: false})
@@ -180,6 +250,11 @@ exports.forgotPassword = catchAsync( async(req, res, next) => {
 
         return next( new AppError('There was an error sending the email. Please try again!', 500))
     }
+
+    res.status(200).json({
+        status: 'success',
+        message: 'Token send to email!'
+      });
 });
 
 exports.resetPassword = catchAsync( async(req, res, next) => {

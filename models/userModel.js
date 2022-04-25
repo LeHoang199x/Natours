@@ -46,11 +46,23 @@ const userSchema = new mongoose.Schema({
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
+    verifyEmailToken: String,
+    verifyEmailTokenExpires: Date,
+    emailVerified: {
+        type: Boolean,
+        default: false
+    },
     active: {
         type: Boolean,
         default: true,
         select: false
-    }
+    },
+    favorite: [
+        {
+          type: mongoose.Schema.ObjectId,
+          ref: 'Tour'
+        }
+      ]
 });
 
 userSchema.pre('save', async function(next) {
@@ -106,6 +118,14 @@ userSchema.methods.createPasswordResetToken = function() {
     this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
     return resetToken;
+};
+
+userSchema.methods.addFavorite = function(tourId) {
+    this.favorite.push(tourId);
+  };
+  
+userSchema.methods.removeFavorite = function(tourId) {
+    this.favorite.pull(tourId);
 };
 
 const User = mongoose.model('User', userSchema);
